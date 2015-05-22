@@ -19,12 +19,8 @@ object LambdaParser extends RegexParsers with PackratParsers {
     expression ~ expression ^^ { case e1 ~ e2 => Application(e1, e2) }
   }
 
-  lazy val parentheses: PackratParser[Parentheses] = {
-    "(" ~> expression <~ ")" ^^ { Parentheses(_) }
-  }
-
   lazy val expression: PackratParser[Expression] = {
-    parentheses | abstraction | application | identifier ^^ { identity }
+    abstraction | application | identifier | "(" ~> expression <~ ")" ^^ { identity }
   }
 
   def apply(input: String) = parseAll(expression, input)

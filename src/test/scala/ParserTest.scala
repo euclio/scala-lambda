@@ -6,18 +6,32 @@ class ParserSpec extends FlatSpec {
   behavior of "A lambda calculus parser"
 
   it should "parse an identifier" in {
-    LambdaParser("y") === Identifier("y")
+    assert(LambdaParser("y").get === Identifier("y"))
   }
 
   it should "parse an application" in {
-    LambdaParser("x y") === Application(Identifier("x"), Identifier("y"))
+    assert(LambdaParser("x y").get ===
+      Application(Identifier("x"), Identifier("y")))
   }
 
   it should "parse an abstraction" in {
-    LambdaParser("\\x.x") === Abstraction(Identifier("x"), Identifier("x"))
+    assert(LambdaParser("\\x.x").get ===
+      Abstraction(Identifier("x"), Identifier("x")))
   }
 
   it should "allow the lambda character in abstractions" in {
-    LambdaParser("λx.x") === Abstraction(Identifier("x"), Identifier("x"))
+    assert(LambdaParser("λx.x").get ===
+      Abstraction(Identifier("x"), Identifier("x")))
+  }
+
+  it should "parse a complicated expression" in {
+    assert(LambdaParser("(λ f.f(f y))((λ x.x)(λ x.x))").get ===
+      Application(
+        Abstraction(Identifier("f"),
+          Application(Identifier("f"),
+            Application(Identifier("f"), Identifier("y")))),
+        Application(
+          Abstraction(Identifier("x"), Identifier("x")),
+          Abstraction(Identifier("x"), Identifier("x")))))
   }
 }
